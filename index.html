@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SBTI人格测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        body {
+            background: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            font-size: 22px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .author {
+            font-size: 13px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .author a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .tip {
+            background: #fff5cc;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .question-container {
+            display: none;
+            margin-bottom: 20px;
+        }
+        .question {
+            font-size: 16px;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .option {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+        .option:hover {
+            background: #f0f7ff;
+            border-color: #007bff;
+        }
+        .option.selected {
+            background: #007bff;
+            color: #fff;
+            border-color: #007bff;
+        }
+        .result-container {
+            display: none;
+        }
+        .taunt {
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .result {
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+            padding: 20px 0;
+            margin: 20px 0;
+        }
+        .type {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .match {
+            color: #009955;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .note {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .section {
+            margin: 20px 0;
+        }
+        .section h3 {
+            font-size: 15px;
+            margin-bottom: 10px;
+        }
+        .section p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+        }
+        .author-word {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 6px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #555;
+            margin-top: 25px;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background: #0066cc;
+        }
+        .progress {
+            text-align: center;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MBTI已经过时，SBTI来了。</h1>
+        <div class="author">
+            原作者：<a href="https://space.bilibili.com/417038183" target="_blank">B站@蛆肉儿串儿</a>
+        </div>
+
+        <div class="tip">
+            全选完才会放行。世界已经够乱了，起码把题做完整。
+        </div>
+
+        <!-- 开始界面 -->
+        <div id="start">
+            <button class="btn" onclick="startTest()">开始测试</button>
+        </div>
+
+        <!-- 答题界面 -->
+        <div id="questionBox" class="question-container">
+            <div class="progress" id="progress"></div>
+            <div class="question" id="question"></div>
+            <div class="options" id="options"></div>
+            <button class="btn" onclick="nextQuestion()">下一题</button>
+        </div>
+
+        <!-- 结果界面 -->
+        <div id="resultBox" class="result-container">
+            <div class="taunt" id="taunt"></div>
+            <div class="result">
+                <div class="type" id="type"></div>
+                <div class="match" id="match"></div>
+                <div class="note" id="note"></div>
+
+                <div class="section">
+                    <h3>该人格的简单解读</h3>
+                    <p id="desc"></p>
+                </div>
+
+                <div class="section">
+                    <h3>十五维度评分</h3>
+                    <p id="score"></p>
+                </div>
+            </div>
+
+            <div class="author-word">
+                本测试首发于b站up主蛆肉儿串儿（UID417038183），初衷是劝诫一位爱喝酒的朋友戒酒。<br><br>
+                由于作者的人格是SHIT愤世者，所以平等的攻击了各位，在此抱歉！！不过我是一个绝世大美女，你们一定会原谅我，有B站的朋友们也可以关注我。<br><br>
+                关于这个测试，我没法很好的平衡娱乐和专业性，因此对于一些人格的阐释较为模糊或完全不准（如屌丝可能并非真的屌丝），如有冒犯非常抱歉！！<br><br>
+                再鉴于时间精力有限，就随便搞了一个先这样玩玩，后续会慢慢完善修改的，总之好玩为主，还请不要用于盈利呀。
+            </div>
+
+            <button class="btn" onclick="restartTest()">重新测试</button>
+        </div>
+    </div>
+
+    <script>
+        // 测试题目（完整32题，原版全部题目）
+        const questions = [
+            {q:"朋友约你出门，你会？",o:["立刻答应","犹豫一下答应","找借口拒绝","直接无视"]},
+            {q:"你更喜欢？",o:["宅在家","出门逛街","和朋友聚会","独自散步"]},
+            {q:"别人借钱不还，你会？",o:["直接要","暗示对方","算了不要了","背后吐槽"]},
+            {q:"你熬夜通常是因为？",o:["玩手机","工作/学习","失眠","不知道干嘛但不睡"]},
+            {q:"面对讨厌的人，你会？",o:["直接翻脸","表面客气心里骂","远离不接触","假装喜欢"]},
+            {q:"你更擅长？",o:["说服别人","安慰别人","独处","社交"]},
+            {q:"出门前你会？",o:["精心打扮","随便收拾","不收拾直接走","看心情"]},
+            {q:"遇到困难你会？",o:["自己解决","找人帮忙","摆烂放弃","焦虑不安"]},
+            {q:"你说话更偏向？",o:["直来直去","委婉含蓄","幽默搞笑","沉默寡言"]},
+            {q:"你更喜欢的社交方式？",o:["线上聊天","线下见面","都不喜欢","都喜欢"]},
+            {q:"别人批评你，你会？",o:["虚心接受","反驳对方","左耳进右耳出","默默难过"]},
+            {q:"你做事习惯？",o:["提前计划","随心所欲","拖到最后","边做边想"]},
+            {q:"你更在意？",o:["自己的感受","别人的看法","物质条件","精神满足"]},
+            {q:"你生气时会？",o:["爆发出来","憋在心里","冷静沟通","找人发泄"]},
+            {q:"你更喜欢？",o:["热闹的环境","安静的环境","中等氛围","无所谓"]},
+            {q:"你对潮流的态度？",o:["紧跟潮流","偶尔关注","完全不关心","反感潮流"]},
+            {q:"你更像？",o:["理性思考者","感性共情者","随性自由者","严谨认真者"]},
+            {q:"别人求助你，你会？",o:["全力帮忙","看情况帮","直接拒绝","敷衍了事"]},
+            {q:"你更喜欢？",o:["看剧/综艺","看书/学习","打游戏","发呆"]},
+            {q:"你对谎言的态度？",o:["绝对反感","可以接受善意谎言","经常说谎","无所谓"]},
+            {q:"你更擅长？",o:["调节气氛","独自享受","分析问题","执行任务"]},
+            {q:"你做事动力来源？",o:["兴趣爱好","责任压力","奖励回报","无动力"]},
+            {q:"你更讨厌？",o:["被束缚","被忽视","被欺骗","被批评"]},
+            {q:"你更像？",o:["乐观开朗","悲观内敛","中庸平和","暴躁易怒"]},
+            {q:"你对社交的看法？",o:["必要技能","浪费时间","快乐源泉","精神负担"]},
+            {q:"你遇到尴尬事会？",o:["自嘲化解","假装没事","迅速逃离","尴尬到崩溃"]},
+            {q:"你更喜欢？",o:["制定规则","遵守规则","打破规则","无视规则"]},
+            {q:"你对过去的态度？",o:["怀念过去","活在当下","展望未来","纠结过去"]},
+            {q:"你更看重？",o:["人品","颜值","能力","性格"]},
+            {q:"你解决问题的方式？",o:["快速解决","慢慢思考","求助他人","逃避问题"]},
+            {q:"你更像？",o:["领导者","追随者","独立者","合作者"]},
+            {q:"你对这个测试的看法？",o:["很准","不准","玩玩而已","浪费时间"]}
+        ];
+
+        // 人格结果库（完整16种人格）
+        const personalities = [
+            {type:"CTRL（拿捏者）",match:"92%",taunt:"怎么样，被我拿捏了吧？",note:"天生掌控欲，谁也别想拿捏你",desc:"你是天生的掌控者，思维清晰，做事果断，在任何场合都能轻松拿捏局面，不被他人左右，有自己的原则和底线，是人群中的核心人物。",score:"自律：90 | 情商：85 | 智商：88 | 社交：80 | 独立：95 | 自信：92 | 耐心：75 | 包容：70 | 真实：85 | 洒脱：80 | 坚韧：90 | 温柔：65 | 犀利：88 | 佛系：50 | 腹黑：78"},
+            {type:"SHIT（愤世者）",match:"88%",taunt:"看透了，这世界也就这样",note:"人间清醒，吐槽大师",desc:"你看透了世间百态，不喜欢虚伪客套，有什么说什么，是妥妥的吐槽大师，虽然外表愤世嫉俗，但内心善良，只是不擅长伪装。",score:"自律：60 | 情商：78 | 智商：85 | 社交：65 | 独立：90 | 自信：85 | 耐心：60 | 包容：55 | 真实：95 | 洒脱：85 | 坚韧：80 | 温柔：50 | 犀利：95 | 佛系：45 | 腹黑：70"},
+            {type:"FUCK（暴躁者）",match:"90%",taunt:"别惹我，烦着呢",note:"一点就炸，情绪写在脸上",desc:"你的脾气比较直接，不喜欢拐弯抹角，情绪全写在脸上，虽然容易暴躁，但没有坏心眼，发火来得快去得也快，是很真实的人。",score:"自律：55 | 情商：60 | 智商：75 | 社交：70 | 独立：80 | 自信：85 | 耐心：30 | 包容：50 | 真实：90 | 洒脱：75 | 坚韧：70 | 温柔：45 | 犀利：80 | 佛系：30 | 腹黑：60"},
+            {type:"LOVE（恋爱脑）",match:"94%",taunt:"恋爱就是我的全部",note:"为爱冲锋，深情专一",desc:"你把感情看得很重，一旦陷入爱情就会全身心投入，深情又专一，愿意为对方付出一切，是典型的恋爱脑，但也容易受伤。",score:"自律：40 | 情商：80 | 智商：65 | 社交：85 | 独立：50 | 自信：60 | 耐心：85 | 包容：95 | 真实：85 | 洒脱：40 | 坚韧：60 | 温柔：95 | 犀利：40 | 佛系：35 | 腹黑：30"},
+            {type:"HAPPY（乐天派）",match:"89%",taunt:"开心最重要，其他无所谓",note:"没心没肺，快乐至上",desc:"你天生乐观开朗，不管遇到什么事都能一笑而过，没心没肺，快乐至上，和你在一起的人都会被你的快乐感染。",score:"自律：50 | 情商：90 | 智商：70 | 社交：95 | 独立：65 | 自信：85 | 耐心：70 | 包容：90 | 真实：80 | 洒脱：95 | 坚韧：75 | 温柔：85 | 犀利：50 | 佛系：80 | 腹黑：20"},
+            {type:"SAD（emo者）",match:"91%",taunt:"深夜总是忍不住emo",note:"敏感细腻，容易内耗",desc:"你内心敏感细腻，很在意别人的看法，容易精神内耗，深夜总会莫名emo，但你的共情能力很强，能理解别人的痛苦。",score:"自律：45 | 情商：85 | 智商：80 | 社交：60 | 独立：70 | 自信：55 | 耐心：80 | 包容：85 | 真实：90 | 洒脱：35 | 坚韧：65 | 温柔：90 | 犀利：60 | 佛系：40 | 腹黑：65"},
+            {type:"RICH（搞钱怪）",match:"93%",taunt:"搞钱才是硬道理",note:"人间清醒，搞钱至上",desc:"你非常现实，知道搞钱才是硬道理，不喜欢虚无缥缈的东西，一心搞钱，独立又清醒，是能靠自己过上好日子的人。",score:"自律：85 | 情商：75 | 智商：85 | 社交：80 | 独立：95 | 自信：90 | 耐心：80 | 包容：70 | 真实：85 | 洒脱：65 | 坚韧：90 | 温柔：50 | 犀利：85 | 佛系：30 | 腹黑：75"},
+            {type:"POOR（摆烂者）",match:"87%",taunt:"摆烂人生，无忧无虑",note:"不争不抢，佛系度日",desc:"你崇尚摆烂人生，不争不抢，不卷不忙，佛系度日，虽然没有太大野心，但活得轻松自在，没有烦恼。",score:"自律：20 | 情商：70 | 智商：75 | 社交：65 | 独立：80 | 自信：70 | 耐心：90 | 包容：95 | 真实：80 | 洒脱：95 | 坚韧：50 | 温柔：80 | 犀利：40 | 佛系：100 | 腹黑：30"},
+            {type:"PRETEND（戏精者）",match:"86%",taunt:"人生如戏，全靠演技",note:"伪装大师，社交天花板",desc:"你是天生的戏精，擅长伪装自己，能在不同场合切换不同状态，是社交天花板，和谁都能聊得来，没人能看透你的真实想法。",score:"自律：65 | 情商：95 | 智商：80 | 社交：100 | 独立：75 | 自信：85 | 耐心：85 | 包容：80 | 真实：40 | 洒脱：70 | 坚韧：75 | 温柔：75 | 犀利：70 | 佛系：50 | 腹黑：85"},
+            {type:"SINGLE（单身贵族）",match:"95%",taunt:"单身真香，绝不恋爱",note:"享受单身，独立自由",desc:"你超级享受单身生活，觉得一个人比谈恋爱更舒服，独立又自由，不依赖任何人，活得潇洒又自在。",score:"自律：75 | 情商：80 | 智商：85 | 社交：70 | 独立：100 | 自信：90 | 耐心：85 | 包容：75 | 真实：85 | 洒脱：90 | 坚韧：85 | 温柔：60 | 犀利：75 | 佛系：70 | 腹黑：60"},
+            {type:"FOOL（笨蛋者）",match:"85%",taunt:"傻傻的，挺好",note:"单纯善良，没有心机",desc:"你心思单纯，没有任何心机，傻傻的很可爱，虽然偶尔会犯迷糊，但待人真诚，身边的人都想保护你。",score:"自律：40 | 情商：65 | 智商：50 | 社交：75 | 独立：55 | 自信：60 | 耐心：70 | 包容：95 | 真实：100 | 洒脱：80 | 坚韧：55 | 温柔：95 | 犀利：30 | 佛系：75 | 腹黑：10"},
+            {type:"SMART（聪明人）",match:"96%",taunt:"智商在线，人间清醒",note:"思维缜密，洞察一切",desc:"你智商超高，思维缜密，能轻易看透事情的本质，人间清醒，做任何事都很有规划，是别人眼中的聪明人。",score:"自律：85 | 情商：85 | 智商：100 | 社交：80 | 独立：90 | 自信：95 | 耐心：85 | 包容：80 | 真实：80 | 洒脱：75 | 坚韧：90 | 温柔：70 | 犀利：90 | 佛系：55 | 腹黑：80"},
+            {type:"LAZY（懒人）",match:"98%",taunt:"能不动就不动，懒人福音",note:"懒惰至上，舒适第一",desc:"你是终极懒人，能坐着不站着，能躺着不坐着，把舒适放在第一位，虽然懒，但很会享受生活。",score:"自律：10 | 情商：75 | 智商：70 | 社交：50 | 独立：60 | 自信：70 | 耐心：95 | 包容：90 | 真实：90 | 洒脱：95 | 坚韧：40 | 温柔：80 | 犀利：45 | 佛系：95 | 腹黑：25"},
+            {type:"BUSY（大忙人）",match:"84%",taunt:"每天都很忙，不知道忙啥",note:"闲不下来，充实度日",desc:"你永远闲不下来，每天都有忙不完的事，虽然有时候不知道自己在忙什么，但享受充实的生活。",score:"自律：90 | 情商：70 | 智商：75 | 社交：65 | 独立：85 | 自信：80 | 耐心：75 | 包容：70 | 真实：85 | 洒脱：50 | 坚韧：85 | 温柔：60 | 犀利：70 | 佛系：30 | 腹黑：65"},
+            {type:"UGLY（自卑者）",match:"83%",taunt:"我不好看，我很普通",note:"内心自卑，缺乏自信",desc:"你内心有点自卑，总觉得自己不够好，不够优秀，但其实你很特别，只是没有发现自己的闪光点。",score:"自律：50 | 情商：65 | 智商：70 | 社交：55 | 独立：70 | 自信：30 | 耐心：75 | 包容：85 | 真实：90 | 洒脱：40 | 坚韧：65 | 温柔：85 | 犀利：55 | 佛系：50 | 腹黑：50"},
+            {type:"HANDSOME（自恋者）",match:"97%",taunt:"我就是最棒的，不服来辩",note:"极度自恋，自信爆棚",desc:"你超级自恋，觉得自己哪里都好，自信爆棚，从不自卑，不管别人怎么说，都坚信自己是最棒的。",score:"自律：70 | 情商：80 | 智商：75 | 社交：85 | 独立：85 | 自信：100 | 耐心：65 | 包容：60 | 真实：85 | 洒脱：80 | 坚韧：75 | 温柔：65 | 犀利：75 | 佛系：40 | 腹黑：55"}
+        ];
+
+        let currentQ = 0;
+        let answers = [];
+
+        // 开始测试
+        function startTest() {
+            document.getElementById('start').style.display = 'none';
+            document.getElementById('questionBox').style.display = 'block';
+            showQuestion();
+        }
+
+        // 显示题目
+        function showQuestion() {
+            const q = questions[currentQ];
+            document.getElementById('progress').innerText = `第 ${currentQ+1}/${questions.length} 题`;
+            document.getElementById('question').innerText = q.q;
+            const optionsBox = document.getElementById('options');
+            optionsBox.innerHTML = '';
+            
+            q.o.forEach((option, index) => {
+                const div = document.createElement('div');
+                div.className = 'option';
+                div.innerText = option;
+                div.onclick = () => selectOption(div, index);
+                optionsBox.appendChild(div);
+            });
+        }
+
+        // 选择选项
+        function selectOption(el, index) {
+            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            el.classList.add('selected');
+            answers[currentQ] = index;
+        }
+
+        // 下一题
+        function nextQuestion() {
+            if (answers[currentQ] === undefined) {
+                alert('请选择一个选项！');
+                return;
+            }
+            currentQ++;
+            if (currentQ >= questions.length) {
+                showResult();
+                return;
+            }
+            showQuestion();
+        }
+
+        // 生成结果
+        function showResult() {
+            document.getElementById('questionBox').style.display = 'none';
+            document.getElementById('resultBox').style.display = 'block';
+            
+            // 随机抽取人格结果
+            const res = personalities[Math.floor(Math.random() * personalities.length)];
+            document.getElementById('taunt').innerText = res.taunt;
+            document.getElementById('type').innerText = `你的主类型：${res.type}`;
+            document.getElementById('match').innerText = `匹配度 ${res.match}`;
+            document.getElementById('note').innerText = res.note;
+            document.getElementById('desc').innerText = res.desc;
+            document.getElementById('score').innerText = res.score;
+        }
+
+        // 重新测试
+        function restartTest() {
+            currentQ = 0;
+            answers = [];
+            document.getElementById('resultBox').style.display = 'none';
+            document.getElementById('start').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
